@@ -8,7 +8,7 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      mode:'welcome',
+      mode:'read',
       welcome: {title: 'Welcome', desc: 'Hello, React!!!'},
       Subject: {title: 'WEB', sub:'World Wide Web!'},
       Content: {title: 'HTML', sub:'HTML is HyperText Markup Language'},
@@ -34,6 +34,9 @@ class App extends Component {
         <Subject 
           title={this.state.Subject.title} 
           sub={this.state.Subject.sub}
+          onChangePage={function(){
+            this.setState({mode:'welcome'})
+          }.bind(this)}
         />
         <TOC data={this.state.Contents}/>
         <Content 
