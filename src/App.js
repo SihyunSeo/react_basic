@@ -9,12 +9,13 @@ import CreateContent from './components/CreateContent';
 class App extends Component {
   constructor(props){
     super(props);
+    this.max_contents_id = 3;
     this.state = {
-      mode:'read',
+      mode:'create',
       selected_content_id: 2,
       welcome: {title: 'Welcome', desc: 'Hello, React!!!'},
       Subject: {title: 'WEB', sub:'World Wide Web!'},
-      Content: {title: 'HTML', sub:'HTML is HyperText Markup Language'},
+      //Content: {title: 'HTML', sub:'HTML is HyperText Markup Language'},
       Contents:[
         {id:1, title:'HTML', desc:'HTML is for information'},
         {id:2, title:'CSS', desc:'CSS is for design'},
@@ -43,7 +44,18 @@ class App extends Component {
       _article = <ReadContent title = {_title} desc = {_desc}></ReadContent>
     }
     else if(this.state.mode === 'create'){
-      _article = <CreateContent />
+      _article = <CreateContent onSubmit={function(_title, _desc){
+        this.max_contents_id = this.max_contents_id + 1;
+        // this.state.Contents.push( ---> 직접적으로 값을 변경하기 때문에 추후 업데이트 하는 과정에서 문제가 발생할 수 있음
+        //   {id: this.max_contents_id, title: _title, desc: _desc}
+        // )
+        var _contents = this.state.Contents.concat( //----> 값을 추가한 새로운 배열을 선언하는 것이므로 원래 배열에 영향을 주지않아 추후 작업에 영향을 주지 않음
+          {id: this.max_contents_id, title: _title, desc: _desc}
+        )
+        this.setState({
+          Contents: _contents
+        });
+      }.bind(this)}/>
     }
     return (
       <div className="App">
