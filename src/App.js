@@ -12,7 +12,7 @@ class App extends Component {
     super(props);
     this.max_contents_id = 3;
     this.state = {
-      mode:'create',
+      mode:'welcome',
       selected_content_id: 2,
       welcome: {title: 'Welcome', desc: 'Hello, React!!!'},
       Subject: {title: 'WEB', sub:'World Wide Web!'},
@@ -52,23 +52,30 @@ class App extends Component {
         // this.state.Contents.push( ---> 직접적으로 값을 변경하기 때문에 추후 업데이트 하는 과정에서 문제가 발생할 수 있음
         //   {id: this.max_contents_id, title: _title, desc: _desc}
         // )
-        var _contents = this.state.Contents.concat( //----> 값을 추가한 새로운 배열을 선언하는 것이므로 원래 배열에 영향을 주지않아 추후 작업에 영향을 주지 않음
-          {id: this.max_contents_id, title: _title, desc: _desc}
-        )
+        var _contents = Array.from(this.state.Contents);
+        _contents.push({id: this.max_contents_id, title: _title, desc: _desc});
         this.setState({
-          Contents: _contents
+          Contents: _contents,
+          mode: 'read',
+          selected_content_id: this.max_contents_id
         });
       }.bind(this)}/>
     }
     else if(this.state.mode === 'update'){
       _content = this.getReadContent();
-      _article = <UpdateContent data={_content} onSubmit={function(_title, _desc){
-        this.max_contents_id = this.max_contents_id + 1;
-        var _contents = this.state.Contents.concat(
-          {id: this.max_contents_id, title: _title, desc: _desc}
-        )
+      _article = <UpdateContent data={_content} onSubmit={function(_id, _title, _desc){
+        var _contents = Array.from(this.state.Contents); //--> array를 통해 좀 더 융통성있게 정보 관리
+        var i = 0;
+        while(i < _contents.length) {
+          if(_contents[i].id === _id) {
+            _contents[i] = {id: _id, title: _title, desc: _desc}
+            break;
+          }
+          i = i + 1;
+        }
         this.setState({
-          Contents: _contents
+          Contents: _contents,
+          mode: 'read'
         });
       }.bind(this)}/>
     }
@@ -94,9 +101,30 @@ class App extends Component {
           }.bind(this)} data={this.state.Contents}/>
         <Control 
           onChangeMode={function(_mode){
-            this.setState({
-              mode: _mode
-            })
+            if(_mode === 'delete') {
+              if(window.confirm('really?')) {
+                var _contents = Array.from(this.state.Contents);
+                var i = 0;
+                while(i < this.state.Contents.length) {
+                  if(_contents[i].id === this.state.selected_content_id) {
+                    _contents.splice(i, 1);
+                    break;
+                  }
+                  i = i + 1;
+                }
+                this.setState({
+                  mode: 'welcome',
+                  Contents: _contents
+                });
+                alert('deleted!!')
+              }
+            }
+            else {
+              this.setState({
+                mode: _mode
+              })
+            }
+            
           }.bind(this)}
         />
         {/* <ReadContent 
